@@ -1,7 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 public class Day
 {
@@ -12,14 +11,22 @@ public class Day
             case 1:
                 day1();
                 day1ex();
+                break;
             case 2:
                 day2();
+                break;
             case 3:
                 day3();
+                break;
             case 4:
                 day4();
+                break;
             case 5:
                 day5();
+                break;
+            case 6:
+                day6();
+                break;
             default:
                 break;
         }
@@ -308,6 +315,99 @@ public class Day
 
     private void day5()
     {
+        File file = new File("day5.txt");
+        HashSet<Integer> set = new HashSet<>();
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String str = "";
+            int max = 0;
+            while((str = reader.readLine()) != null)
+            {
+                int row = 0;
+                int col = 0;
+                for(int i = 0; i < 7; i++)
+                {
+                    if(str.charAt(i) == 'B'){row++;}
+                    row = row << 1;
+                }
+                for(int i = 7; i < 10;i++)
+                {
+                    if(str.charAt(i) == 'R'){col++;}
+                    col = col << 1;
+                }
+                row = row >> 1;
+                col = col >> 1;
+                set.add(row*8+col);
+                max =  Math.max(max, row*8+col);
+            }
+            for(int i = 8; i <= 970; i++)
+            {
+                if(!set.contains(i)){System.out.println("DAY5EX: " + i);}
+            }
+            System.out.println("DAY5: " + max);
+
+        }
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
+
+    }
+
+    private void day6()
+    {
+        File file = new File("day6.txt");
+
+        try
+        {
+            HashSet<Character> set = new HashSet<>();
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String str = "";
+            int total = 0;
+            int totalEX = 0;
+            int line = 0;
+            int[] alp = new int[26];
+            while((str = reader.readLine()) != null)
+            {
+                if(str.equals(""))
+                {
+                    total = total + set.size();
+                    set = new HashSet<>();
+                    for(int i : alp)
+                    {
+                        if(i == line){totalEX++;}
+                    }
+                    line = 0;
+                    alp = new int[26];
+                }
+                else
+                {
+                    for(char c : str.toCharArray())
+                    {
+                        set.add(c);
+                        alp[c-'a']++;
+                    }
+                    line++;
+                }
+            }
+            //total = total + set.size();
+            System.out.println("DAY6: " + total);
+            System.out.println("DAY6EX: " + totalEX);
+
+        }
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
 
     }
 
