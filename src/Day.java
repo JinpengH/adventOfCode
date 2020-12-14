@@ -411,6 +411,57 @@ public class Day
 
     }
 
+    private void day7()
+    {
+        File file = new File("day7.txt");
+
+        try
+        {
+            HashSet<Character> set = new HashSet<>();
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String str = "";
+            int total = 0;
+            int totalEX = 0;
+            int line = 0;
+            int[] alp = new int[26];
+            while((str = reader.readLine()) != null)
+            {
+                if(str.equals(""))
+                {
+                    total = total + set.size();
+                    set = new HashSet<>();
+                    for(int i : alp)
+                    {
+                        if(i == line){totalEX++;}
+                    }
+                    line = 0;
+                    alp = new int[26];
+                }
+                else
+                {
+                    for(char c : str.toCharArray())
+                    {
+                        set.add(c);
+                        alp[c-'a']++;
+                    }
+                    line++;
+                }
+            }
+            //total = total + set.size();
+            System.out.println("DAY6: " + total);
+            System.out.println("DAY6EX: " + totalEX);
+
+        }
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
+
+    }
 
 
 }
