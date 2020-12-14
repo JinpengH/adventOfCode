@@ -35,7 +35,17 @@ public class Day
             case 9:
                 day9();
                 break;
-
+            case 10:
+                day10();
+                break;
+            case 11:
+                day11();
+                day11EX();
+                break;
+            case 12:
+                day12();
+                day12EX();
+                break;
             default:
                 break;
         }
@@ -710,17 +720,183 @@ public class Day
 
     private void day10()
     {
-        File file = new File("day6.txt");
-
+        File file = new File("day10.txt");
+        int max = 0;
+        Set<Integer> set = new HashSet<>();
         try
         {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String str;
+
+            max = 0;
             while((str = reader.readLine()) != null)
             {
-
-
+                int par = Integer.parseInt(str);
+                set.add(par);
+                max = Math.max(max,par);
             }
+            int i = 0;
+            int diffOne = 0;
+            int diffThree = 1;
+            while(i != max)
+            {
+                if(set.contains(i+1))
+                {
+                    diffOne++;
+                    i++;
+                }
+                else if(set.contains(i+2))
+                {
+                    i+=2;
+                }
+                else
+                {
+                    diffThree++;
+                    i+=3;
+                }
+            }
+            System.out.println("DAY10: " + diffOne * diffThree);
+
+
+            //EX
+
+            System.out.println("DAY10EX: " + day10Helper(0, set, max, new HashMap<Integer, Long>()));
+        }
+
+
+
+
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
+
+    }
+
+    private long day10Helper(int i, Set<Integer> set, int max, Map<Integer, Long> map)
+    {
+        if(i == max){return 1;}
+        if(map.containsKey(i)){return map.get(i);}
+        long sum = 0;
+        if(set.contains(i+1))
+        {
+            sum += day10Helper(i+1, set, max, map);
+        }
+        if(set.contains(i+2))
+        {
+            sum += day10Helper(i+2, set, max, map);
+        }
+        if(set.contains(i+3))
+        {
+            sum += day10Helper(i+3, set, max, map);
+        }
+        map.put(i,sum);
+        return sum;
+    }
+
+    private void day11()
+    {
+        File file = new File("day11.txt");
+
+        try
+        {
+            //init
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String str;
+            List<List<Character>> board = new ArrayList<>();
+            boolean flag = true;
+            int len = 0;
+            while((str = reader.readLine()) != null)
+            {
+                if(flag)
+                {
+                    flag = false;
+                    len = str.length() + 2;
+                    List<Character> list = new ArrayList<>(len);
+                    for(int i = 0; i < len; i++){list.add('.');}
+                    board.add(list);
+                }
+                List<Character> list = new ArrayList<>(len);
+                list.add('.');
+                for(char c : str.toCharArray()){list.add(c);}
+                list.add('.');
+                board.add(list);
+            }
+            List<Character> list = new ArrayList<>(len);
+            for(int i = 0; i < len; i++){list.add('.');}
+            board.add(list);
+
+
+            //no
+            boolean isChanged = true;
+            int count = 0;
+            while(isChanged) {
+
+                List<List<Character>> newBoard = new LinkedList<>();
+                List<Character> newList = new ArrayList<>(len);
+                for(int j = 0; j < board.size(); j++)
+                {
+                    newList = new ArrayList<>(len);
+                    for (int i = 0; i < len; i++)
+                    {
+                        newList.add('.');
+                    }
+                    newBoard.add(newList);
+                }
+
+                isChanged = false;
+                count = 0;
+                for (int i = 1; i < board.size() - 1; i++) {
+                    for (int j = 1; j < board.get(0).size() - 1; j++) {
+                        int occCount = 0;
+                        char set = board.get(i).get(j);
+                        if (board.get(i - 1).get(j - 1) == '#') {
+                            occCount++;
+                        }
+                        if (board.get(i).get(j - 1) == '#') {
+                            occCount++;
+                        }
+                        if (board.get(i + 1).get(j - 1) == '#') {
+                            occCount++;
+                        }
+                        if (board.get(i - 1).get(j + 1) == '#') {
+                            occCount++;
+                        }
+                        if (board.get(i).get(j + 1) == '#') {
+                            occCount++;
+                        }
+                        if (board.get(i + 1).get(j + 1) == '#') {
+                            occCount++;
+                        }
+                        if (board.get(i - 1).get(j) == '#') {
+                            occCount++;
+                        }
+                        if (board.get(i + 1).get(j) == '#') {
+                            occCount++;
+                        }
+                        if (board.get(i).get(j) == 'L' && occCount == 0) {
+                            set = '#';
+                            isChanged = true;
+                        }
+                        if (board.get(i).get(j) == '#' && occCount >= 4) {
+                            set = 'L';
+                            isChanged = true;
+                        }
+                        newBoard.get(i).set(j,set);
+                        if(set == '#'){count++;}
+                    }
+                }
+                board = newBoard;
+            }
+
+            System.out.println("DAY11: " + count);
+
+
+
         }
         catch(FileNotFoundException fe)
         {
@@ -732,6 +908,275 @@ public class Day
         }
 
     }
+
+    private void day11EX()
+    {
+        File file = new File("day11.txt");
+
+        try
+        {
+            //init
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String str;
+            List<List<Character>> board = new ArrayList<>();
+            boolean flag = true;
+            int len = 0;
+            while((str = reader.readLine()) != null)
+            {
+                if(flag)
+                {
+                    flag = false;
+                    len = str.length() + 2;
+                    List<Character> list = new ArrayList<>(len);
+                    for(int i = 0; i < len; i++){list.add('.');}
+                    board.add(list);
+                }
+                List<Character> list = new ArrayList<>(len);
+                list.add('.');
+                for(char c : str.toCharArray()){list.add(c);}
+                list.add('.');
+                board.add(list);
+            }
+            List<Character> list = new ArrayList<>(len);
+            for(int i = 0; i < len; i++){list.add('.');}
+            board.add(list);
+
+
+            //ex
+            boolean isChanged = true;
+            int count = 0;
+            while(isChanged) {
+
+                List<List<Character>> newBoard = new LinkedList<>();
+                List<Character> newList = new ArrayList<>(len);
+                for(int j = 0; j < board.size(); j++)
+                {
+                    newList = new ArrayList<>(len);
+                    for (int i = 0; i < len; i++)
+                    {
+                        newList.add('.');
+                    }
+                    newBoard.add(newList);
+                }
+
+                isChanged = false;
+                count = 0;
+                for (int i = 1; i < board.size() - 1; i++) {
+                    for (int j = 1; j < board.get(0).size() - 1; j++) {
+                        int occCount = 0;
+                        char set = board.get(i).get(j);
+                        if (day11Helper(board, i, j, 1, 1)) {
+                            occCount++;
+                        }
+                        if (day11Helper(board, i, j, 1, 0)) {
+                            occCount++;
+                        }
+                        if (day11Helper(board, i, j, 1, -1)) {
+                            occCount++;
+                        }
+                        if (day11Helper(board, i, j, 0, 1)) {
+                            occCount++;
+                        }
+                        if (day11Helper(board, i, j, 0, -1)) {
+                            occCount++;
+                        }
+                        if (day11Helper(board, i, j, -1, 1)) {
+                            occCount++;
+                        }
+                        if (day11Helper(board, i, j, -1, 0)) {
+                            occCount++;
+                        }
+                        if (day11Helper(board, i, j, -1, -1)) {
+                            occCount++;
+                        }
+                        if (board.get(i).get(j) == 'L' && occCount == 0) {
+                            set = '#';
+                            isChanged = true;
+                        }
+                        if (board.get(i).get(j) == '#' && occCount >= 5) {
+                            set = 'L';
+                            isChanged = true;
+                        }
+                        newBoard.get(i).set(j,set);
+                        if(set == '#'){count++;}
+                    }
+                }
+                board = newBoard;
+            }
+
+            System.out.println("DAY11EX: " + count);
+
+
+
+        }
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
+
+    }
+
+    private boolean day11Helper(List<List<Character>> board, int row, int col, int i, int j)
+    {
+        row += i;
+        col += j;
+        while(row < board.size() && row >= 0 && col < board.get(0).size() && col >= 0)
+        {
+
+            if(board.get(row).get(col) == '#'){return true;}
+            else if(board.get(row).get(col) == 'L'){return false;}
+            row += i;
+            col += j;
+        }
+        return false;
+    }
+
+    private void day12()
+    {
+        //init
+        File file = new File("day12.txt");
+        char[] dir = new char[]{'E','S','W','N'};
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String str;
+            int diag = 0;
+            int hor = 0;
+            int currDir = 0;
+            while((str = reader.readLine()) != null)
+            {
+                char ins = str.charAt(0);
+                int f = Integer.parseInt(str.substring(1));
+                if(ins == 'F'){ins = dir[currDir];}
+                switch (ins)
+                {
+                    case 'E':
+                        diag += f;
+                        break;
+                    case 'S':
+                        hor += f;
+                        break;
+                    case 'W':
+                        diag -= f;
+                        break;
+                    case 'N':
+                        hor -= f;
+                        break;
+                    case 'R':
+                        currDir += f/90;
+                        currDir += 4;
+                        currDir = currDir%4;
+                        break;
+                    case 'L':
+                        currDir -= f/90;
+                        currDir += 4;
+                        currDir = currDir%4;
+                        break;
+                }
+            }
+
+            System.out.println("DAY12: " + (Math.abs(diag) + Math.abs(hor)));
+        }
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
+
+    }
+
+    private void day12EX()
+    {
+        //init
+        File file = new File("day12.txt");
+        char[] dir = new char[]{'E','S','W','N'};
+        int[] waypoint = new int[]{10, 1};
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String str;
+            int diag = 0;
+            int hor = 0;
+            int currDir = 0;
+            while((str = reader.readLine()) != null)
+            {
+                char ins = str.charAt(0);
+                int f = Integer.parseInt(str.substring(1));
+                int[] res;
+                switch (ins)
+                {
+                    case 'E':
+                        waypoint[0] += f;
+                        break;
+                    case 'S':
+                        waypoint[1] -= f;
+                        break;
+                    case 'W':
+                        waypoint[0] -= f;
+                        break;
+                    case 'N':
+                        waypoint[1] += f;
+                        break;
+                    case 'F':
+                        diag += waypoint[0] * f;
+                        hor += waypoint[1] * f;
+                        break;
+                    case 'R':
+                        f = f/90;
+                        waypoint = day12Helper(f, waypoint[0], waypoint[1]);
+
+                        break;
+                    case 'L':
+                        f = -f/90;
+                        waypoint = day12Helper(f, waypoint[0], waypoint[1]);
+
+                        break;
+                }
+            }
+
+            System.out.println("DAY12EX: " + (Math.abs(diag) + Math.abs(hor)));
+        }
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
+
+    }
+
+    private int[] day12Helper(int i, int diag, int hor)
+    {
+        if(i < 0){i += 4;}
+        i = i % 4;
+        for(int j = 0; j < i; j++)
+        {
+            if((diag ^ hor) > 0)
+            {
+                int middle = diag;
+                diag = hor;
+                hor = -middle;
+            }
+            else
+            {
+                int middle = diag;
+                diag = -hor;
+                hor = middle;
+            }
+        }
+        return new int[]{diag,hor};
+
+    }
+
 
     private void dayEX()
     {
