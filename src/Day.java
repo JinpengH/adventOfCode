@@ -46,6 +46,16 @@ public class Day
                 day12();
                 day12EX();
                 break;
+            case 13:
+                day13();
+                break;
+            case 14:
+                day14();
+                day14EX();
+                break;
+            case 15:
+                day15();
+                break;
             default:
                 break;
         }
@@ -1131,12 +1141,10 @@ public class Day
                     case 'R':
                         f = f/90;
                         waypoint = day12Helper(f, waypoint[0], waypoint[1]);
-
                         break;
                     case 'L':
                         f = -f/90;
                         waypoint = day12Helper(f, waypoint[0], waypoint[1]);
-
                         break;
                 }
             }
@@ -1156,27 +1164,286 @@ public class Day
 
     private int[] day12Helper(int i, int diag, int hor)
     {
+        //System.out.println("diag: " + diag);
+        //System.out.println("hor: " + hor);
+
         if(i < 0){i += 4;}
         i = i % 4;
+        //System.out.println(i);
         for(int j = 0; j < i; j++)
         {
-            if((diag ^ hor) > 0)
-            {
-                int middle = diag;
-                diag = hor;
-                hor = -middle;
-            }
-            else
-            {
-                int middle = diag;
-                diag = -hor;
-                hor = middle;
-            }
+            int middle = diag;
+            diag = hor;
+            hor = -middle;
         }
+        //System.out.println("diag: " + diag);
+        //System.out.println("hor: " + hor);
         return new int[]{diag,hor};
 
     }
 
+    private void day13()
+    {
+        File file = new File("day13.txt");
+
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            int timestamp;
+            timestamp = Integer.parseInt(reader.readLine());
+            String str = reader.readLine();
+            String[] strArr = str.split(",");
+            int minDiff = Integer.MAX_VALUE;
+            int minBus = 0;
+            int x = 0;
+            for(String s : strArr)
+            {
+                if(s.equals("x")){x++;continue;}
+                else{
+                    System.out.println(x);
+                    x++;
+                }
+                int i = Integer.parseInt(s);
+                int diff = i - timestamp % i;
+                if(diff == i){diff = 0;}
+                if(diff < minDiff)
+                {
+                    minDiff = diff;
+                    minBus = i;
+                }
+            }
+            System.out.println("DAY13: " + minBus * minDiff);
+
+
+        }
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
+
+    }
+
+    private void day14()
+    {
+        File file = new File("day14.txt");
+
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String str;
+            long andMask = 0;
+            long orMask = 0;
+            Map<Integer, Long> map = new HashMap<>();
+            while((str = reader.readLine()) != null)
+            {
+                if(str.substring(0,4).equals("mask"))
+                {
+                    andMask = 0;
+                    orMask = 0;
+                    for(char c: str.substring(7).toCharArray())
+                    {
+                        andMask++;
+                        if(c == '1')
+                        {
+                            orMask++;
+                        }
+                        else if(c == '0')
+                        {
+                            andMask--;
+                        }
+                        orMask = orMask << 1;
+                        andMask = andMask << 1;
+                    }
+                    orMask = orMask >> 1;
+                    andMask = andMask >> 1;
+                }
+                else
+                {
+                    String[] strArr = str.split(" ");
+                    int number = Integer.parseInt(strArr[2]);
+                    int key = Integer.parseInt(strArr[0].substring(4,strArr[0].length()-1));
+                    //System.out.println("DEBUG: number: " + number + " key: " + key);
+                    long handle = (number & andMask) | orMask;
+                    map.put(key,handle);
+                    //System.out.println(handle);
+                }
+            }
+
+            long sum = 0;
+            for(Map.Entry<Integer, Long> entry : map.entrySet())
+            {
+                sum += entry.getValue();
+            }
+            System.out.println("DAY14: " + sum);
+        }
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
+
+    }
+
+    private void day14EX()
+    {
+        File file = new File("day14.txt");
+
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String str;
+            String mask = "";
+            Map<Long, Integer> map = new HashMap<>();
+            while((str = reader.readLine()) != null)
+            {
+                if(str.substring(0,4).equals("mask"))
+                {
+                    mask = str.substring(7);
+                }
+                else
+                {
+                    String[] strArr = str.split(" ");
+                    int number = Integer.parseInt(strArr[2]);
+                    int key = Integer.parseInt(strArr[0].substring(4,strArr[0].length()-1));
+                    //System.out.println("DEBUG: number: " + number + " key: " + key);
+                    List<Long> list = day14Helper(mask, key);
+                    for(Long i : list){map.put(i,number);}
+                    //System.out.println(handle);
+                }
+            }
+
+            long sum = 0;
+            for(Map.Entry<Long, Integer> entry : map.entrySet())
+            {
+                sum += entry.getValue();
+            }
+            System.out.println("DAY14: " + sum);
+        }
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
+
+    }
+
+    private List<Long> day14Helper(String mask, int number)
+    {
+
+        List<Long> list = new ArrayList<>();
+        list.add((long)0);
+        String bin = Integer.toBinaryString(number);
+        StringBuilder sb = new StringBuilder();
+        sb.append("0".repeat(Math.max(0, mask.length() - bin.length())));
+        sb.append(bin);
+        String padded = sb.toString();
+        List<Long> newList = new ArrayList<>();
+        for(int i = 0; i < mask.length(); i++)
+        {
+            switch (mask.charAt(i))
+            {
+                case '0':
+                    newList = new ArrayList<>();
+                    for(Long l : list)
+                    {
+                        if(padded.charAt(i) == '1'){l+=1;}
+                        l = l << 1;
+                        newList.add(l);
+                    }
+                    list = newList;
+                    break;
+                case '1':
+                    newList = new ArrayList<>();
+                    for(Long l : list)
+                    {
+                        l+=1;
+                        l = l << 1;
+                        newList.add(l);
+                    }
+                    list = newList;
+                    break;
+                case 'X':
+                    newList = new ArrayList<>();
+                    for(Long l : list)
+                    {
+                        long m = (l+1) << 1;
+                        newList.add(m);
+                        l = l << 1;
+                        newList.add(l);
+                    }
+                    list = newList;
+                    break;
+            }
+        }
+        for(Long l : list)
+        {
+            l = l >> 1;
+            System.out.println("DEBUG: list: " + l);
+        }
+        return list;
+    }
+
+    private void day15()
+    {
+        File file = new File("day15.txt");
+
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            HashMap<Integer, int[]> map = new HashMap<>();
+
+            String str;
+            int i = 0;
+            int prev = 0;
+            while((str = reader.readLine()) != null)
+            {
+                String[] strArr = str.split(",");
+                for(i = 0; i < strArr.length; i++)
+                {
+                    int tr = Integer.parseInt(strArr[i]);
+                    map.put(tr, new int[]{i+1, -1});
+                    prev = tr;
+                }
+            }
+            i++;
+            for(;i <= 30000000; i++)
+            {
+                if(map.get(prev)[1] == -1){prev = 0;}
+                else{prev = map.get(prev)[0] - map.get(prev)[1];}
+                if(map.containsKey(prev))
+                {
+                    int first = i;
+                    int second = map.get(prev)[0];
+                    map.put(prev, new int[]{first,second});
+                }
+                else{map.put(prev,new int[]{i, -1});}
+                //System.out.println("DEBUG: " + i + ": " + prev);
+            }
+
+            System.out.println("DAY15: " + prev);
+
+
+        }
+        catch(FileNotFoundException fe)
+        {
+            System.out.println("Cannot find the file");
+        }
+        catch (IOException ioe)
+        {
+            System.out.println("Read error");
+        }
+
+    }
 
     private void dayEX()
     {
